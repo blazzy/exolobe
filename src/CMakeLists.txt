@@ -31,8 +31,8 @@ foreach(S ${SOURCE})
 endforeach(S)
 
 add_library(mc STATIC ${SOURCE} ${SQLITE3_SOURCE})
-target_link_libraries(mc sqlite3 uuid) #TODO Find uuid instead of assuming it's there.
-                                       #TODO Determine alternative for MS Windows.
+target_link_libraries(mc sqlite3 uuid glib-2.0) #TODO Find uuid and glib instead of assuming they exist
+                                                #TODO Determine alternatives for MS Windows.
 
 add_custom_command(OUTPUT tags COMMAND ctags ${SOURCE_FULL_PATH} DEPENDS ${SOURCE_FULL_PATH})
 add_custom_command(OUTPUT lint COMMAND ${LINT_CMD} ${SOURCE_FULL_PATH})

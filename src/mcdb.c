@@ -3,8 +3,9 @@
 #include <assert.h>
 
 #include <sqlite3.h>
-
+#include <glib.h>
 #include <uuid/uuid.h>
+#include <sys/stat.h>
 
 #include "mcdb.h"
 #include "mcstd.h"
@@ -28,11 +29,28 @@ static int prepare( mcdb_Connection *conn, const char *query, sqlite3_stmt **sta
 
 
 int mcdb_init( mcdb_Connection **conn ) {
+  char *dbDir;
+  char *dbFile;
+
   fprintf( stderr, "initializing database\n" );
 
   *conn = ( mcdb_Connection* )malloc( sizeof( mcdb_Connection ) );
 
-  if( sqlite3_open( "metaDB", &( ( *conn )->db ) ) ) {
+  dbDir = g_strconcat( g_get_user_data_dir(), "/metacortex", NULL );
+  if ( !g_file_test ( dbDir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR ) ) {
+    if( -1 == g_mkdir_with_parents( dbDir, S_IRUSR | S_IWUSR | S_IXUSR ) ) {
+      fprintf( stderr, "error: could not create data folder %s\n", dbDir );
+      g_free( dbDir );
+      return 0;
+    }
+  }
+  dbFile = g_build_filename( dbDir, "db", NULL );
+  g_free( dbDir );
+
+  int dbNotOpened = sqlite3_open( dbFile, &( ( *conn )->db ) );
+  g_free( dbFile );
+
+  if( dbNotOpened ) {
     fprintf( stderr, "error: %s\n", sqlite3_errmsg( ( *conn )->db ) );
     mcdb_shutdown( *conn );
     return 0;
