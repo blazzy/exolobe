@@ -98,6 +98,7 @@ int main( int argc, char **argv ) {
 
   gtk_widget_show_all( window );
 
+  searchEntryChanged( searchEntry, nameStore );
   gtk_main();
 
   mcdb_shutdown( conn );
