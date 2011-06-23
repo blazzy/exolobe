@@ -148,7 +148,7 @@ int mcdb_next( mcdb_Connection *conn, mcdb_Result *result ) {
   if( step == SQLITE_ROW ) {
     result->uuid = sqlite3_column_text( result->imp->stmt, 0 );
     result->a    = sqlite3_column_text( result->imp->stmt, 1 );
-    result->b    = sqlite3_column_text( result->imp->stmt, 1 );
+    result->b    = sqlite3_column_text( result->imp->stmt, 2 );
     return 0;
   }
 
