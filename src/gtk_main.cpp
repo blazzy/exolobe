@@ -1,6 +1,54 @@
+extern "C" {
 #include <gtk/gtk.h>
-
 #include "mcdb.h"
+}
+
+struct NameList {
+  GtkWidget         *treeView;
+  GtkListStore      *listStore;
+  GtkTreeViewColumn *column;
+  GtkCellRenderer   *nameRenderer;
+  GtkTreeSelection  *select;
+
+  enum Columns {
+    KEY_COLUMN = 0,
+    VALUE_COLUMN,
+  };
+
+  NameList( GtkWidget *textView );
+  static void changed( GtkTreeSelection *widget, GtkTextView *textView );
+};
+
+
+NameList::NameList( GtkWidget *textView ) {
+  listStore    = gtk_list_store_new( 2, G_TYPE_STRING, G_TYPE_STRING );
+  treeView     = gtk_tree_view_new_with_model( GTK_TREE_MODEL( listStore ) );
+  nameRenderer = gtk_cell_renderer_text_new();
+
+  column       = gtk_tree_view_column_new_with_attributes( "Keys", nameRenderer, "text", KEY_COLUMN,  NULL );
+  gtk_tree_view_append_column( GTK_TREE_VIEW( treeView ), column );
+
+  g_object_unref( G_OBJECT( listStore ) );
+
+
+  select = gtk_tree_view_get_selection( GTK_TREE_VIEW ( treeView ) );
+  gtk_tree_selection_set_mode( select, GTK_SELECTION_SINGLE );
+
+  g_signal_connect( select, "changed", G_CALLBACK( NameList::changed ), textView );
+}
+
+
+void NameList::changed( GtkTreeSelection *selection, GtkTextView *textView ) {
+  GtkTreeIter iter;
+  GtkTreeModel *model;
+  const char *key;
+
+  if( gtk_tree_selection_get_selected( selection, &model, &iter) ) {
+    gtk_tree_model_get( model, &iter, VALUE_COLUMN, &key, -1 );
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer( textView );
+    gtk_text_buffer_set_text( buffer, key, -1 );
+  }
+}
 
 
 mcdb_Connection *conn;
@@ -11,11 +59,11 @@ static void destroy( GtkWidget *widget ) {
 }
 
 
-static void searchEntryChanged( GtkWidget *widget, GtkListStore *listStore ) {
+static void searchEntryChanged( GtkWidget *widget, GtkListStore *keyStore ) {
   const char *text;
   GtkTreeIter iter;
 
-  gtk_list_store_clear( listStore );
+  gtk_list_store_clear( keyStore );
   text = gtk_entry_get_text( GTK_ENTRY( widget ) );
 
   mcdb_Result *result;
@@ -25,8 +73,11 @@ static void searchEntryChanged( GtkWidget *widget, GtkListStore *listStore ) {
   if( result ) {
     while( !mcdb_next( conn, result ) ) {
       fprintf( stderr, "%s : %s\n", result->a, result->b );
-      gtk_list_store_append( listStore, &iter );
-      gtk_list_store_set( listStore, &iter, 0, result->a, -1 );
+      gtk_list_store_append( keyStore, &iter );
+      gtk_list_store_set( keyStore, &iter,
+        NameList::KEY_COLUMN   , result->a,
+        NameList::VALUE_COLUMN, result->b,
+        -1 );
     }
   } else {
     fprintf( stderr, "No Results\n" );
@@ -68,10 +119,6 @@ int main( int argc, char **argv ) {
   GtkWidget         *window;
   GtkWidget         *textView;
   GtkWidget         *searchEntry;
-  GtkWidget         *nameList;
-  GtkListStore      *nameStore;
-  GtkCellRenderer   *nameRenderer;
-  GtkTreeViewColumn *column;
 
   gtk_init( &argc, &argv );
 
@@ -80,25 +127,19 @@ int main( int argc, char **argv ) {
   window       = gtk_window_new( GTK_WINDOW_TOPLEVEL );
   searchEntry  = gtk_entry_new();
   textView     = textViewNew();
-  nameStore    = gtk_list_store_new( 1, G_TYPE_STRING );
-  nameList     = gtk_tree_view_new_with_model( GTK_TREE_MODEL( nameStore ) );
-  nameRenderer = gtk_cell_renderer_text_new();
-  column       = gtk_tree_view_column_new_with_attributes( "Keys", nameRenderer, "text", 0,  NULL );
 
-  gtk_tree_view_append_column( GTK_TREE_VIEW( nameList ), column );
+  NameList *nameList = new NameList( textView );
 
-  g_object_unref( G_OBJECT( nameStore ) );
+  layoutWindow( window, searchEntry, nameList->treeView, textView );
 
-  layoutWindow( window, searchEntry, nameList, textView );
-
-  g_signal_connect( searchEntry, "changed", G_CALLBACK( searchEntryChanged ), nameStore );
+  g_signal_connect( searchEntry, "changed", G_CALLBACK( searchEntryChanged ), nameList->listStore );
 
   g_signal_connect( window, "destroy", G_CALLBACK( destroy ), NULL );
   gtk_window_set_title( GTK_WINDOW( window ), "Meta Cortex" );
 
   gtk_widget_show_all( window );
 
-  searchEntryChanged( searchEntry, nameStore );
+  searchEntryChanged( searchEntry, nameList->listStore );
   gtk_main();
 
   mcdb_shutdown( conn );

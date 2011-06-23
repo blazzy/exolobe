@@ -15,7 +15,7 @@ set(SOURCE
   mcstd.c mcstd.h)
 
 set(CMD_SOURCE  main.c)
-set(GTK_SOURCE  gtk_main.c)
+set(GTK_SOURCE  gtk_main.cpp)
 
 set(SQLITE3_SOURCE sqlite3.c sqlite3.h)
 
