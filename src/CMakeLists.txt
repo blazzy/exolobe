@@ -37,12 +37,16 @@ target_link_libraries(mc sqlite3 uuid glib-2.0) #TODO Find uuid and glib instead
 add_custom_command(OUTPUT tags COMMAND ctags ${SOURCE_FULL_PATH} DEPENDS ${SOURCE_FULL_PATH})
 add_custom_command(OUTPUT lint COMMAND ${LINT_CMD} ${SOURCE_FULL_PATH})
 
-add_executable(mccmd ${CMD_SOURCE} tags)
-target_link_libraries(mccmd mc)
+add_executable(mcdb ${CMD_SOURCE} tags)
+target_link_libraries(mcdb mc)
 
 if(GTK2_FOUND)
   include_directories(${GTK2_INCLUDE_DIRS})
 
   add_executable(mcgtk ${GTK_SOURCE})
   target_link_libraries(mcgtk mc ${GTK2_LIBRARIES})
+
+  INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/mcgtk DESTINATION bin)
 endif()
+
+INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/mcdb DESTINATION bin)
