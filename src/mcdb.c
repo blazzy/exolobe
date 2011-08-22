@@ -63,7 +63,10 @@ int mcdb_init( mcdb_Connection **conn ) {
     }
   }
 
-  if( prepare( *conn, "INSERT INTO pair VALUES( ?, ?, ? );", &( *conn )->addPStmt ) ) {
+  if( prepare( *conn,
+               "INSERT INTO pair ( uuid, a, b, creation_date, modification_date ) "
+               "VALUES( ?, ?, ?, datetime( 'now' ), datetime( 'now') );",
+               &( *conn )->addPStmt ) ) {
     fprintf( stderr, "error: %s\n", sqlite3_errmsg( ( *conn )->db ) );
     mcdb_shutdown( *conn );
     return 0;
@@ -162,7 +165,7 @@ int mcdb_next( mcdb_Connection *conn, mcdb_Result *result ) {
 }
 
 
-#define CREATE_TABLES "CREATE TABLE pair (uuid, a, b);"
+#define CREATE_TABLES "CREATE TABLE pair (uuid, a, b, creation_date, modification_date );"
 
 static int createTables( mcdb_Connection *conn )  {
   sqlite3_stmt *statement;
