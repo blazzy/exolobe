@@ -2,7 +2,11 @@ extern "C" {
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include "mcdb.h"
+
+#include "gtk_globalBinding.h"
 }
+
+namespace mcgtk {
 
 struct NameList;
 
@@ -65,6 +69,8 @@ Window::Window() {
 
   gtk_key_snooper_install( keySnooper, window );
   gtk_window_set_focus( GTK_WINDOW( window ), 0 );
+
+  globalBinding( GTK_WINDOW( window ) );
 }
 
 
@@ -162,7 +168,6 @@ void Window::layout() {
 
 int Window::keySnooper( GtkWidget *widget, GdkEventKey *event, gpointer data ) {
   if( event->keyval == GDK_KEY_q && event->state & GDK_CONTROL_MASK ) {
-    fprintf( stderr, "Quit Key" );
     destroy( );
   }
 
@@ -173,14 +178,16 @@ int Window::keySnooper( GtkWidget *widget, GdkEventKey *event, gpointer data ) {
   return 0;
 }
 
+}
 
 int main( int argc, char **argv ) {
 
   gtk_init( &argc, &argv );
 
-  Window window;
+  mcgtk::Window window;
 
   gtk_main();
 
   return 0;
 }
+
