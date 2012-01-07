@@ -16,9 +16,10 @@ include_directories(
   ${GLIB2_INCLUDE_DIRS})
 
 set(LINT_CMD clang --analyze)
-set(CMAKE_C_FLAGS "-std=c99 -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused-value -pedantic")
+set(CMAKE_C_FLAGS "-std=c99 -Wall -Wextra -Werror -pedantic")
 set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra -Werror -pedantic -Wno-unused-parameter")
-set(CMAKE_C_FLAGS_DEBUG "-O0 -g")
+set(CMAKE_C_FLAGS_DEBUG "-O0 -ggdb")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
 
 set(SOURCE
   eldb.cpp        eldb.hpp
