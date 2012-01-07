@@ -60,20 +60,18 @@
 
 /* Set this to what your compiler uses for 64 bit data type */
 #ifdef WIN32
-#define unsigned64_t unsigned __int64
 #define I64(C) C
 #else
-#define unsigned64_t unsigned long long
 #define I64(C) C##LL
 #endif
 
-typedef unsigned64_t uuid_time_t;
+typedef uint64_t uuid_time_t;
 
-const uuid_t null_locktoken = {0};
+const uuid_t null_locktoken;
 
-static void format_uuid_v1(uuid_t * uuid, unsigned16 clockseq, uuid_time_t timestamp, uuid_node_t node);
+static void format_uuid_v1(uuid_t * uuid, uint16_t clockseq, uuid_time_t timestamp, uuid_node_t node);
 static void get_current_time(uuid_time_t * timestamp);
-static unsigned16 true_random(void);
+static uint16_t true_random(void);
 static void get_pseudo_node_identifier(uuid_node_t *node);
 static void get_system_time(uuid_time_t *uuid_time);
 static void get_random_info(unsigned char seed[16]);
@@ -110,7 +108,7 @@ void create_uuid_state(uuid_state *st)
  */
 void format_token(char *target, const uuid_t *u)
 {
-  sprintf(target, "%08lx-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+  sprintf(target, "%08" PRIx32 "-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 	  u->time_low, u->time_mid, u->time_hi_and_version,
 	  u->clock_seq_hi_and_reserved, u->clock_seq_low,
 	  u->node[0], u->node[1], u->node[2],
@@ -194,7 +192,7 @@ int compare_token(const uuid_t a, const uuid_t b)
 }
 
 /* format_uuid_v1 -- make a UUID from the timestamp, clockseq, and node ID */
-static void format_uuid_v1(uuid_t * uuid, unsigned16 clock_seq,
+static void format_uuid_v1(uuid_t * uuid, uint16_t clock_seq,
 			   uuid_time_t timestamp, uuid_node_t node)
 {
     /* Construct a version 1 uuid with the information we've gathered
@@ -215,7 +213,7 @@ static void get_current_time(uuid_time_t * timestamp)
 {
     uuid_time_t         time_now;
     static uuid_time_t  time_last;
-    static unsigned16   uuids_this_tick;
+    static uint16_t     uuids_this_tick;
     static int          inited = 0;
     
     if (!inited) {
@@ -244,7 +242,7 @@ static void get_current_time(uuid_time_t * timestamp)
 
 /* true_random -- generate a crypto-quality random number.
    This sample doesn't do that. */
-static unsigned16 true_random(void)
+static uint16_t true_random(void)
 {
     uuid_time_t time_now;
 

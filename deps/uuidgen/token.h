@@ -41,9 +41,7 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 
-typedef unsigned long   unsigned32;
-typedef unsigned short  unsigned16;
-typedef unsigned char   unsigned8;
+#include <inttypes.h>
 
 typedef struct {
     char nodeID[6];
@@ -53,19 +51,19 @@ typedef struct {
 
 typedef struct _uuid_t
 {
-    unsigned32	time_low;
-    unsigned16	time_mid;
-    unsigned16	time_hi_and_version;
-    unsigned8	clock_seq_hi_and_reserved;
-    unsigned8	clock_seq_low;
-    unsigned8	node[6];
+    uint32_t	time_low;
+    uint16_t	time_mid;
+    uint16_t	time_hi_and_version;
+    uint8_t 	clock_seq_hi_and_reserved;
+    uint8_t 	clock_seq_low;
+    uint8_t 	node[6];
 } uuid_t;
 
 /* data type for UUID generator persistent state */
 	
 typedef struct {
     uuid_node_t node;     /* saved node ID */
-    unsigned16 cs;        /* saved clock sequence */
+    uint16_t cs;        /* saved clock sequence */
 } uuid_state;
 
 extern const uuid_t null_locktoken;
