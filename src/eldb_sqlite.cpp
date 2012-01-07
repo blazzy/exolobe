@@ -4,7 +4,9 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <uuid/uuid.h>
+extern "C" {
+#include <token.h>
+}
 
 #include "eldb_sqlite.hpp"
 #include "eldb_util.hpp"
@@ -63,7 +65,7 @@ int SQLiteDatabase::tableExists( const char *tableName ) {
   int err = sqlite3_prepare_v2( conn, query, queryLength, &ppStmt, 0 );
 
   sqlite3_finalize( ppStmt );
-  delete query;
+  delete [] query;
    
   if ( err ) {
     return 0;
@@ -190,11 +192,13 @@ Ptr<DatabaseSearchResult> SQLiteDatabase::findValue( const char * ) {
 int SQLiteDatabase::insert( const char *key, const char *val ) {
   int step;
   int err;
-  char uuidStr[36];
+  char uuidStr[37];
 
+  uuid_state state;
   uuid_t uuid;
-  uuid_generate_random( uuid );
-  uuid_unparse( uuid, uuidStr );
+  create_uuid_state( &state );
+  create_token( &state, &uuid );
+  format_token( uuidStr, &uuid );
 
   err =  sqlite3_bind_text( addPStmt, 1, uuidStr, -1, NULL ) ||
          sqlite3_bind_text( addPStmt, 2, key, -1, NULL )     ||
