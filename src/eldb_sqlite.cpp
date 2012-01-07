@@ -14,7 +14,6 @@ extern "C" {
 
 namespace eldb {
 
-
 #define CREATE_TABLES "CREATE TABLE pair ( uuid, a, b, creation_date, modification_date );"
 
 SQLiteDatabase::SQLiteDatabase(): conn( NULL ), addPStmt( NULL ) {
@@ -61,11 +60,11 @@ int SQLiteDatabase::tableExists( const char *tableName ) {
   sqlite3_stmt *ppStmt;
   char *query;
 
-  int queryLength = new_sprintf( &query, "SELECT 1 FROM %s WHERE 1 = 0", tableName );
+  int queryLength = malloc_sprintf( &query, "SELECT 1 FROM %s WHERE 1 = 0", tableName );
   int err = sqlite3_prepare_v2( conn, query, queryLength, &ppStmt, 0 );
 
   sqlite3_finalize( ppStmt );
-  delete [] query;
+  free( query );
    
   if ( err ) {
     return 0;
@@ -142,21 +141,6 @@ struct SQLiteDatabaseSearchResult: DatabaseSearchResult {
     return 0;
   }
 };
-
-
-int malloc_sprintf( char **str, const char * format, ... ) {
-  va_list ap,apCopy;
-  int length;
-
-  va_start( ap, format );
-    length = vsnprintf( NULL, 0, format, ap );
-    *str = (char *) malloc( length + 1 );
-    va_copy( apCopy, ap );
-      vsnprintf( *str, length + 1, format, ap );
-    va_end( apCopy );
-  va_end( ap );
-  return length;
-}
 
 
 Ptr<DatabaseSearchResult> SQLiteDatabase::findExactKey( const char *key ) {

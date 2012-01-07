@@ -7,24 +7,25 @@
 #include <cstring>
 
 
-int new_sprintf( char **str, const char * format, ... ) {
+int malloc_sprintf( char **str, const char * format, ... ) {
   va_list ap,apCopy;
   int length;
 
   va_start( ap, format );
     va_copy( apCopy, ap );
-    length = vsnprintf( NULL, 0, format, ap );
-    *str = new char[length + 1];
+      length = vsnprintf( NULL, 0, format, ap );
+      *str = (char *) malloc( length + 1 );
       vsnprintf( *str, length + 1, format, apCopy );
     va_end( apCopy );
   va_end( ap );
   return length;
 }
 
-const char *new_strcpy( const char *str ) {
+
+const char *malloc_strcpy( const char *str ) {
   int length = strlen( str );
 
-  char *ret = new char[length + 1];
+  char *ret = (char *) malloc( length + 1 );
   strcpy( ret, str );
   return ret;
 }

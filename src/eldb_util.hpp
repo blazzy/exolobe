@@ -4,8 +4,8 @@
 #ifndef _MCSTD_H_
 #define _MCSTD_H_
 
-int new_sprintf( char **str, const char *format, ... );
+int malloc_sprintf( char **str, const char *format, ... );
 
-const char *new_strcpy( const char *str );
+const char *malloc_strcpy( const char *str );
 
 #endif
