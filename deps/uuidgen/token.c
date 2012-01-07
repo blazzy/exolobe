@@ -38,6 +38,18 @@
 ** this software for any purpose.
 */
 
+
+#ifdef WIN32
+#include <windows.h>
+#else
+#define _BSD_SOURCE
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/sysinfo.h>
+#include <ctype.h>
+#include <unistd.h>
+#endif
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,14 +57,6 @@
 
 #include "md5.h"
 #include "token.h"
-
-#ifdef WIN32
-#include <windows.h>
-#else
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/sysinfo.h>
-#endif
 
 /* set the following to the number of 100ns ticks of the actual resolution of
    your system's clock */
