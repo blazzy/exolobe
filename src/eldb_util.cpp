@@ -12,10 +12,10 @@ int new_sprintf( char **str, const char * format, ... ) {
   int length;
 
   va_start( ap, format );
+    va_copy( apCopy, ap );
     length = vsnprintf( NULL, 0, format, ap );
     *str = new char[length + 1];
-    va_copy( apCopy, ap );
-      vsnprintf( *str, length + 1, format, ap );
+      vsnprintf( *str, length + 1, format, apCopy );
     va_end( apCopy );
   va_end( ap );
   return length;
