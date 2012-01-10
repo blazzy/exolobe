@@ -15,6 +15,8 @@ extern "C" {
 namespace eldb {
 
 #define CREATE_TABLES "CREATE TABLE pair ( uuid, a, b, creation_date, modification_date, encryption_key, salt );" \
+                      "CREATE TABLE tag ( name );"                                                                \
+                      "CREATE TABLE tag_pair ( name, pair_uuid );"                                                \
                       "CREATE TABLE config ( version, device_uuid, private_key, public_key );"
 
 SQLiteDatabase::SQLiteDatabase(): conn( NULL ), addPStmt( NULL ) {
