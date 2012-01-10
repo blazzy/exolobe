@@ -14,14 +14,14 @@ extern "C" {
 
 namespace eldb {
 
-#define CREATE_TABLES "CREATE TABLE pair ( uuid, a, b, creation_date, modification_date );"
+#define CREATE_TABLES "CREATE TABLE pair ( uuid, a, b, creation_date, modification_date, encryption_key, salt );" \
+                      "CREATE TABLE config ( version, device_uuid, private_key, public_key );"
 
 SQLiteDatabase::SQLiteDatabase(): conn( NULL ), addPStmt( NULL ) {
 }
 
 
 SQLiteDatabase::~SQLiteDatabase() {
-  fprintf( stderr, "shutting down database\n" );
   if ( conn ) {
     if ( addPStmt )
       sqlite3_finalize( addPStmt );
@@ -40,9 +40,11 @@ int SQLiteDatabase::init( const char *file ) {
     return 0;
   }
 
+  //If the schema has never been created, create it.
   if ( ! tableExists( "pair" ) ) {
-    if ( ! createTables() )
+    if ( ! createTables() ) {
       return 0;
+    }
   }
 
   if ( prepare( "INSERT INTO pair ( uuid, a, b, creation_date, modification_date ) "
@@ -75,17 +77,18 @@ int SQLiteDatabase::tableExists( const char *tableName ) {
 
 
 int SQLiteDatabase::createTables()  {
-  sqlite3_stmt *statement;
-  int err, step;
-
   fprintf( stderr, "creating tables\n" );
-  err = prepare( CREATE_TABLES, &statement );
-  if ( !err ) step = sqlite3_step( statement );
 
-  sqlite3_finalize( statement );
+  char *errStr = 0;
+  int err = sqlite3_exec( conn, CREATE_TABLES, 0, 0, &errStr );
 
-  if ( err || step != SQLITE_DONE ) {
-    fprintf( stderr, "error: %s\n", sqlite3_errmsg( conn ) );
+  if ( err  ) {
+    if ( errStr ) {
+      fprintf( stderr, "error: Failed to create database: %s\n", errStr );
+      sqlite3_free( errStr );
+    } else {
+      fprintf( stderr, "error: Failed to create database.\n" );
+    }
     return 0;
   }
 
