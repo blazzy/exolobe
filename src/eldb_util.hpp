@@ -8,4 +8,6 @@ int malloc_sprintf( char **str, const char *format, ... );
 
 const char *malloc_strcpy( const char *str );
 
+void  gen_uuid( char uuidStr[37] );
+
 #endif

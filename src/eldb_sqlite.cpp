@@ -4,10 +4,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-extern "C" {
-#include <token.h>
-}
-
 #include "eldb_sqlite.hpp"
 #include "eldb_util.hpp"
 
@@ -183,11 +179,7 @@ int SQLiteDatabase::insert( const char *key, const char *val ) {
   int err;
   char uuidStr[37];
 
-  uuid_state state;
-  uuid_t uuid;
-  create_uuid_state( &state );
-  create_token( &state, &uuid );
-  format_token( uuidStr, &uuid );
+  gen_uuid( uuidStr );
 
   err =  sqlite3_bind_text( addPStmt, 1, uuidStr, -1, NULL ) ||
          sqlite3_bind_text( addPStmt, 2, key, -1, NULL )     ||

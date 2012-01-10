@@ -6,6 +6,10 @@
 #include <cstdarg>
 #include <cstring>
 
+extern "C" {
+#include <token.h>
+}
+
 
 int malloc_sprintf( char **str, const char * format, ... ) {
   va_list ap,apCopy;
@@ -28,4 +32,13 @@ const char *malloc_strcpy( const char *str ) {
   char *ret = (char *) malloc( length + 1 );
   strcpy( ret, str );
   return ret;
+}
+
+
+void gen_uuid( char uuidStr[37] ) {
+  uuid_state state;
+  uuid_t uuid;
+  create_uuid_state( &state );
+  create_token( &state, &uuid );
+  format_token( uuidStr, &uuid );
 }
