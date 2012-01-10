@@ -10,6 +10,8 @@
 
 namespace eldb {
 
+#define VERSION 1
+
 #define CREATE_TABLES "CREATE TABLE pair ( uuid, a, b, creation_date, modification_date, encryption_key, salt );" \
                       "CREATE TABLE tag ( name );"                                                                \
                       "CREATE TABLE tag_pair ( name, pair_uuid );"                                                \
@@ -84,9 +86,32 @@ int SQLiteDatabase::createTables()  {
     if ( errStr ) {
       fprintf( stderr, "error: Failed to create database: %s\n", errStr );
       sqlite3_free( errStr );
-    } else {
-      fprintf( stderr, "error: Failed to create database.\n" );
     }
+
+    return 0;
+  }
+
+  sqlite3_stmt *stmt;
+  char uuid[37];
+  gen_uuid(uuid);
+  int step;
+
+  if ( prepare( "INSERT INTO config ( version, device_uuid ) VALUES( ?, ? );", &stmt ) ) {
+    fprintf( stderr, "error: %s\n", sqlite3_errmsg( conn ) );
+    return 0;
+  }
+
+  err =  sqlite3_bind_text( stmt, 1, uuid, -1, NULL )        ||
+         sqlite3_bind_int( stmt,  2, VERSION );
+
+  if ( !err ) {
+    step = sqlite3_step( stmt );
+  }
+
+  sqlite3_finalize( stmt );
+
+  if ( err || SQLITE_DONE != step ) {
+    fprintf( stderr, "error: %s\n", sqlite3_errmsg( conn ) );
     return 0;
   }
 
@@ -177,12 +202,12 @@ Ptr<DatabaseSearchResult> SQLiteDatabase::findValue( const char * ) {
 int SQLiteDatabase::insert( const char *key, const char *val ) {
   int step;
   int err;
-  char uuidStr[37];
+  char uuid[37];
 
-  gen_uuid( uuidStr );
+  gen_uuid( uuid );
 
-  err =  sqlite3_bind_text( addPStmt, 1, uuidStr, -1, NULL ) ||
-         sqlite3_bind_text( addPStmt, 2, key, -1, NULL )     ||
+  err =  sqlite3_bind_text( addPStmt, 1, uuid, -1, NULL ) ||
+         sqlite3_bind_text( addPStmt, 2, key, -1, NULL )  ||
          sqlite3_bind_text( addPStmt, 3, val, -1, NULL );
 
   if ( !err ) {
