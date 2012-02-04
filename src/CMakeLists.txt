@@ -36,6 +36,7 @@ target_link_libraries(sqlite3 dl pthread)
 set_target_properties(sqlite3 PROPERTIES COMPILE_FLAGS
   "-Wno-parentheses-equality -Wno-unused-parameter -Wno-unused-value -Wno-unused-but-set-variable")
 
+add_definitions(-DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 
 set(UUID_SOURCE
  ../deps/uuidgen/md5.c
@@ -66,6 +67,7 @@ if(X11_FOUND)
   target_link_libraries(elgtk el ${GTK2_LIBRARIES} ${X11_LIBRARIES})
 
   INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/elgtk DESTINATION bin)
+  INSTALL(PROGRAMS ../icon/exolobe_tray.png DESTINATION share/exolobe)
 endif()
 endif()
 

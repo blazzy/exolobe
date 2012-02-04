@@ -9,6 +9,9 @@ extern "C" {
 #include "eldb.hpp"
 #include "eldb_gtk_globalkeybind.hpp"
 
+#define TRAY_ICON INSTALL_PREFIX "/share/exolobe/exolobe_tray.png"
+#define APP_ICON INSTALL_PREFIX "/share/exolobe/exolobe_tray.png"
+
 namespace elgtk {
 
 struct KeyList;
@@ -72,7 +75,7 @@ Window::Window() {
   layout();
 
   GError *error;
-  if ( ! gtk_window_set_icon_from_file( GTK_WINDOW( window ), "exolobe_tray.png", &error ) ) {
+  if ( ! gtk_window_set_icon_from_file( GTK_WINDOW( window ), APP_ICON, &error ) ) {
     fprintf( stderr, "%s\n", error->message );
     g_error_free( error );
   }
@@ -92,8 +95,7 @@ Window::Window() {
 
   GtkStatusIcon *status_icon = gtk_status_icon_new();
   g_signal_connect( G_OBJECT(status_icon), "activate", G_CALLBACK( status_icon_click ), this );
-  //g_signal_connect( G_OBJECT(status_icon), "popup-menu", G_CALLBACK( status_icon_on_menu ), NULL );
-  gtk_status_icon_set_from_file( status_icon, "exolobe_tray.png" );
+  gtk_status_icon_set_from_file( status_icon, TRAY_ICON );
   gtk_status_icon_set_tooltip( status_icon, "Exo-Lobe (Alt-F9)" );
   gtk_status_icon_set_visible( status_icon, 1 );
 
