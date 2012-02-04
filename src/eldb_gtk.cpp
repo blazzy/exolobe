@@ -67,6 +67,12 @@ Window::Window() {
   keyList     = new KeyList( valueList );
   layout();
 
+  GError *error;
+  if ( ! gtk_window_set_icon_from_file( GTK_WINDOW( window ), "exolobe_tray.png", &error ) ) {
+    fprintf( stderr, "%s\n", error->message );
+    g_error_free( error );
+  }
+
   g_signal_connect( searchEntry, "changed", G_CALLBACK( searchEntryChanged ), this );
 
   g_signal_connect( window, "destroy", G_CALLBACK( destroy ), NULL );
