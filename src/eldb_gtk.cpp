@@ -24,11 +24,14 @@ struct Window {
   ValueList *valueList;
 
   Window();
+  ~Window();
+  void toggleVisibility();
+  void layout();
 
   static void destroy();
+  static void status_icon_click( GtkWidget *widget, Window *window );
   static void searchEntryChanged( GtkWidget *widget, Window *window );
   static int keySnooper( GtkWidget *widget, GdkEventKey *event, gpointer data );
-  void layout();
 };
 
 
@@ -76,12 +79,8 @@ Window::Window() {
   g_signal_connect( searchEntry, "changed", G_CALLBACK( searchEntryChanged ), this );
 
   g_signal_connect( window, "destroy", G_CALLBACK( destroy ), NULL );
-  gtk_window_set_title( GTK_WINDOW( window ), "The Exo Lobe" );
+  gtk_window_set_title( GTK_WINDOW( window ), "Exo-Lobe" );
   gtk_window_set_default_size( GTK_WINDOW( window ), 800, 300 );
-
-  gtk_widget_show_all( window );
-  gtk_window_stick( GTK_WINDOW( window ) );
-  gtk_window_set_keep_above( GTK_WINDOW( window ), 1 );
 
   searchEntryChanged( searchEntry, this );
 
@@ -89,6 +88,37 @@ Window::Window() {
   gtk_window_set_focus( GTK_WINDOW( window ), 0 );
 
   globalBinding( GTK_WINDOW( window ) );
+
+  GtkStatusIcon *status_icon = gtk_status_icon_new();
+  g_signal_connect( G_OBJECT(status_icon), "activate", G_CALLBACK( status_icon_click ), this );
+  //g_signal_connect( G_OBJECT(status_icon), "popup-menu", G_CALLBACK( status_icon_on_menu ), NULL );
+  gtk_status_icon_set_from_file( status_icon, "exolobe_tray.png" );
+  gtk_status_icon_set_tooltip( status_icon, "Exo-Lobe (Alt-F9)" );
+  gtk_status_icon_set_visible( status_icon, 1 );
+
+  toggleVisibility();
+}
+
+
+Window::~Window() {
+  delete valueList;
+  delete keyList;
+}
+
+
+void Window::status_icon_click( GtkWidget *widget, Window *window ) {
+  window->toggleVisibility();
+}
+
+
+void Window::toggleVisibility() {
+  if ( gtk_widget_get_visible( window ) ) {
+    gtk_widget_hide( window );
+  } else {
+    gtk_widget_show_all( window );
+    gtk_window_stick( GTK_WINDOW( window ) );
+    gtk_window_set_keep_above( GTK_WINDOW( window ), 1 );
+  }
 }
 
 
