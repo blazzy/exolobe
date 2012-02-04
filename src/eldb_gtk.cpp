@@ -53,7 +53,8 @@ struct KeyList {
 
 
 struct ValueList {
-  GtkWidget* vBox;
+  GtkWidget *vBox;
+  GtkWidget *textView;
   ValueList();
 };
 
@@ -143,19 +144,23 @@ KeyList::KeyList( ValueList *valueList ) {
 void KeyList::changed( GtkTreeSelection *selection, ValueList *valueList ) {
   GtkTreeIter iter;
   GtkTreeModel *model;
-  //const char *key;
+  const char *key;
 
   if ( gtk_tree_selection_get_selected( selection, &model, &iter ) ) {
-/*    gtk_tree_model_get( model, &iter, VALUE_COLUMN, &key, -1 );
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer( textView );
-    gtk_text_buffer_set_text( buffer, key, -1 );*/
+    gtk_tree_model_get( model, &iter, VALUE_COLUMN, &key, -1 );
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer( GTK_TEXT_VIEW( valueList->textView ) );
+    gtk_text_buffer_set_text( buffer, key, -1 );
+
   }
 }
 
 
 ValueList::ValueList() {
   vBox = gtk_vbox_new( FALSE, 3 );
-  //TODO gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW( textView ), GTK_WRAP_WORD_CHAR );
+  textView = gtk_text_view_new();
+  gtk_text_view_set_wrap_mode( GTK_TEXT_VIEW( textView ), GTK_WRAP_WORD_CHAR );
+
+  gtk_container_add( GTK_CONTAINER( vBox ), textView );
 }
 
 
