@@ -194,6 +194,10 @@ void Window::searchEntryChanged( GtkWidget *widget, Window *window ) {
           -1 );
       }
     }
+    GtkTreeSelection *selection =
+      gtk_tree_view_get_selection( GTK_TREE_VIEW( window->keyList->treeView ) );
+    gtk_tree_model_get_iter_first( GTK_TREE_MODEL( keyStore ), &iter );
+    gtk_tree_selection_select_iter( selection, &iter );
   } else {
     fprintf( stderr, "No Results\n" );
   }
