@@ -147,10 +147,8 @@ void Window::searchEntryChanged( GtkWidget *widget, Window *window ) {
 
   if ( result->count ) {
     for ( auto key: result->keys ) {
-      fprintf( stdout, "%s :\n", key->key.c_str() );
-      
+
       for ( auto value: key->values ) {
-        fprintf( stdout, "\t%s\n", value->value.c_str() );
 
         gtk_list_store_append( keyStore, &iter );
         gtk_list_store_set( keyStore, &iter,
