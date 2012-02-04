@@ -80,3 +80,22 @@ void globalBinding( GtkWindow *window ) {
 
   gdk_window_add_filter( root, keyFilter, window );
 }
+
+
+static int x11ErrorHandler( Display *dpy, XErrorEvent *error ) {
+  int  buffer_len = 100;
+  char *buffer    = new char[buffer_len];
+
+  XGetErrorText( dpy, error->error_code, buffer, buffer_len );
+
+  fprintf( stderr, "%s\n", buffer );
+
+  delete buffer;
+
+  return 1;
+}
+
+
+void x11Init() {
+  XSetErrorHandler( x11ErrorHandler );
+}

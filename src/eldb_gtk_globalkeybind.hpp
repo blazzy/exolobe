@@ -5,5 +5,6 @@
 #define _GTK_GLOBALBINDING_H_
 
 void globalBinding( GtkWindow *window );
+void x11Init();
 
 #endif

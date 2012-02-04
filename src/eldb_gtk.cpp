@@ -226,7 +226,6 @@ void Window::layout() {
 }
 
 
-
 int Window::keySnooper( GtkWidget *widget, GdkEventKey *event, gpointer data ) {
   if ( event->keyval == GDK_KEY_q && event->state & GDK_CONTROL_MASK ) {
     destroy( );
@@ -244,6 +243,8 @@ int Window::keySnooper( GtkWidget *widget, GdkEventKey *event, gpointer data ) {
 int main( int argc, char **argv ) {
 
   gtk_init( &argc, &argv );
+
+  x11Init();
 
   elgtk::Window window;
 
