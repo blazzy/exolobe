@@ -41,7 +41,7 @@ struct KeyList {
 
   enum Columns {
     KEY_COLUMN = 0,
-    VALUE_COLUMN,
+    VALUE_COLUMN
   };
 
   KeyList( ValueList *valueList );
