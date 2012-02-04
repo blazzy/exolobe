@@ -71,6 +71,7 @@ Window::Window() {
 
   g_signal_connect( window, "destroy", G_CALLBACK( destroy ), NULL );
   gtk_window_set_title( GTK_WINDOW( window ), "The Exo Lobe" );
+  gtk_window_set_default_size( GTK_WINDOW( window ), 800, 300 );
 
   gtk_widget_show_all( window );
   gtk_window_stick( GTK_WINDOW( window ) );
