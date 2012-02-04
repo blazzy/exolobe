@@ -119,6 +119,7 @@ void Window::toggleVisibility() {
     gtk_widget_hide( window );
   } else {
     gtk_widget_show_all( window );
+    gtk_window_present( GTK_WINDOW( window ) );
     gtk_window_stick( GTK_WINDOW( window ) );
     gtk_window_set_keep_above( GTK_WINDOW( window ), 1 );
   }
