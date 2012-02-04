@@ -4,7 +4,13 @@
 #ifndef _GTK_GLOBALBINDING_H_
 #define _GTK_GLOBALBINDING_H_
 
-void globalBinding( GtkWindow *window );
+struct GlobalKeyHandler {
+  virtual void handleGlobalKey( int mask, int keysym ) = 0;
+};
+
+void globalBinding( GlobalKeyHandler *handler, int modMask, int keySym );
 void x11Init();
+int lookupKey( const char * key );
+void raiseWindow( GtkWindow *gtkWindow );
 
 #endif

@@ -18,7 +18,7 @@ struct KeyList;
 struct ValueList;
 
 
-struct Window {
+struct Window: GlobalKeyHandler {
   eldb::Eldb eldb;
 
   GtkWidget *window;
@@ -30,9 +30,13 @@ struct Window {
   ~Window();
   void toggleVisibility();
   void layout();
+  void handleGlobalKey( int mask, int keysym );
+
+  int globalKeySym;
+  int globalKeyMask;
 
   static void destroy();
-  static void status_icon_click( GtkWidget *widget, Window *window );
+  static void statusIconClick( GtkWidget *widget, Window *window );
   static void searchEntryChanged( GtkWidget *widget, Window *window );
   static int keySnooper( GtkWidget *widget, GdkEventKey *event, gpointer data );
 };
@@ -91,15 +95,17 @@ Window::Window() {
   gtk_key_snooper_install( keySnooper, window );
   gtk_window_set_focus( GTK_WINDOW( window ), 0 );
 
-  globalBinding( GTK_WINDOW( window ) );
+  globalKeySym  = lookupKey( "F1" );
+  globalKeyMask = GDK_MOD4_MASK;
+  globalBinding( this, globalKeyMask, globalKeySym );
 
   GtkStatusIcon *status_icon = gtk_status_icon_new();
-  g_signal_connect( G_OBJECT(status_icon), "activate", G_CALLBACK( status_icon_click ), this );
+  g_signal_connect( G_OBJECT(status_icon), "activate", G_CALLBACK( statusIconClick ), this );
   gtk_status_icon_set_from_file( status_icon, TRAY_ICON );
   gtk_status_icon_set_tooltip( status_icon, "Exo-Lobe (Alt-F9)" );
   gtk_status_icon_set_visible( status_icon, 1 );
 
-  toggleVisibility();
+  gtk_widget_show_all( window );
 }
 
 
@@ -109,19 +115,31 @@ Window::~Window() {
 }
 
 
-void Window::status_icon_click( GtkWidget *widget, Window *window ) {
+void Window::handleGlobalKey( int mask, int keysym ) {
+  if ( keysym == globalKeySym && mask == globalKeyMask ) {
+    if ( gtk_widget_get_visible( window ) ) {
+      gtk_widget_hide( window );
+    } else {
+      gtk_window_present( GTK_WINDOW( window ) );
+      raiseWindow( GTK_WINDOW( window ) );
+    }
+  }
+}
+
+
+void Window::statusIconClick( GtkWidget *widget, Window *window ) {
   window->toggleVisibility();
 }
 
 
 void Window::toggleVisibility() {
-  if ( gtk_widget_get_visible( window ) ) {
+  if ( gtk_window_has_toplevel_focus( GTK_WINDOW( window ) ) ) {
     gtk_widget_hide( window );
   } else {
-    gtk_widget_show_all( window );
     gtk_window_present( GTK_WINDOW( window ) );
-    gtk_window_stick( GTK_WINDOW( window ) );
-    gtk_window_set_keep_above( GTK_WINDOW( window ), 1 );
+    raiseWindow( GTK_WINDOW( window ) );
+    //gtk_window_stick( GTK_WINDOW( window ) );
+    //gtk_window_set_keep_above( GTK_WINDOW( window ), 1 );
   }
 }
 
