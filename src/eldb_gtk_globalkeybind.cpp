@@ -16,8 +16,8 @@ extern "C" {
 void raiseWindow( GtkWindow *gtkWindow ) {
   GdkScreen *screen = gtk_widget_get_screen( GTK_WIDGET( gtkWindow ) );
   Display   *dpy    = GDK_WINDOW_XDISPLAY( gdk_get_default_root_window() );
-  Window    window  = GDK_WINDOW_XWINDOW( GTK_WIDGET( gtkWindow )->window );
-  Window    root    = GDK_WINDOW_XWINDOW( gdk_get_default_root_window() );
+  Window    window  = GDK_WINDOW_XID( gtk_widget_get_window( GTK_WIDGET( gtkWindow ) ) );
+  Window    root    = GDK_WINDOW_XID( gdk_get_default_root_window() );
   XEvent    msgEvent;
 
   if ( gdk_x11_screen_supports_net_wm_hint( screen, gdk_atom_intern_static_string( "_NET_ACTIVE_WINDOW" ) ) ) {

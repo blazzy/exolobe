@@ -4,8 +4,10 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE debug)
 endif(NOT CMAKE_BUILD_TYPE)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ../deps/cmake/)
+
 find_package(PkgConfig)
-find_package(GTK2 REQUIRED gtk)
+find_package(GTK3 REQUIRED gtk)
 find_package(X11 REQUIRED)
 
 pkg_check_modules(GLIB2 REQUIRED glib-2.0)
@@ -13,6 +15,7 @@ pkg_check_modules(GLIB2 REQUIRED glib-2.0)
 include_directories(
   ../deps/sqlite
   ../deps/uuidgen
+  ${GTK3_INCLUDE_DIRS}
   ${GLIB2_INCLUDE_DIRS})
 
 set(LINT_CMD clang --analyze)
@@ -59,12 +62,12 @@ add_custom_command(OUTPUT lint COMMAND ${LINT_CMD} ${SOURCE_FULL_PATH})
 add_executable(eldb ${CMD_SOURCE})
 target_link_libraries(eldb el)
 
-if(GTK2_FOUND)
+if(GTK3_FOUND)
 if(X11_FOUND)
-  include_directories(${GTK2_INCLUDE_DIRS})
+  include_directories(${GTK3_INCLUDE_DIRS})
 
   add_executable(elgtk ${GTK_SOURCE})
-  target_link_libraries(elgtk el ${GTK2_LIBRARIES} ${X11_LIBRARIES})
+  target_link_libraries(elgtk el ${GTK3_LIBRARIES} ${X11_LIBRARIES})
 
   INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/elgtk DESTINATION bin)
   INSTALL(PROGRAMS ../icon/exolobe_tray.png DESTINATION share/exolobe)
