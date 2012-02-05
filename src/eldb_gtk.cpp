@@ -102,8 +102,10 @@ Window::Window() {
   GtkStatusIcon *status_icon = gtk_status_icon_new();
   g_signal_connect( G_OBJECT(status_icon), "activate", G_CALLBACK( statusIconClick ), this );
   gtk_status_icon_set_from_file( status_icon, TRAY_ICON );
-  //gtk_status_icon_set_tooltip( status_icon, "Exo-Lobe (Alt-F9)" );
+  gtk_status_icon_set_tooltip_text( status_icon, "Exolobe" );
   gtk_status_icon_set_visible( status_icon, 1 );
+
+  gtk_window_set_has_resize_grip( GTK_WINDOW( window ), 1 );
 
   gtk_widget_show_all( window );
 }
