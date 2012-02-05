@@ -95,7 +95,7 @@ Window::Window() {
   gtk_key_snooper_install( keySnooper, window );
   gtk_window_set_focus( GTK_WINDOW( window ), 0 );
 
-  globalKeySym  = lookupKey( "F1" );
+  globalKeySym  = lookupKey( "e" );
   globalKeyMask = GDK_MOD4_MASK;
   globalBinding( this, globalKeyMask, globalKeySym );
 
